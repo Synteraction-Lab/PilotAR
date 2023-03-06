@@ -18,7 +18,7 @@ from Utilities.screen_capture import get_second_monitor_original_pos
 FPS_SCALE = 3
 
 class StreamPlayer:
-    def __init__(self, isFPV, ip="192.168.31.144", user="hellojanaka", pw="testing1234"):
+    def __init__(self, isFPV, ip="192.168.31.144", user="helloabc", pw="testing1234"):
         self.video_size = (1920, 1080)
         self.NO_OF_GRID_ROWS = 5
         self.NO_OF_GRID_COLS = 5
