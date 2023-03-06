@@ -1,0 +1,34 @@
+name: woz
+channels:
+  - defaults
+  - pytorch
+  - menpo
+  - conda-forge
+  - postelrich
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+    - tk
+    - numpy
+    - pandas
+    - pygame
+    - reportlab
+    - mss
+    - screeninfo
+    - pynput
+    - opencv-python
+    - ffmpeg
+    - tkvideoplayer
+    - python-miio
+    - phue
+    - ttkbootstrap
+    - pydub
+    - psutil
+    - ffmpeg-python
+    - python-vlc
+    - vosk
+    - typing-extensions
+    - customtkinter==5.0.1
+    - openai-whisper
+    - srt
