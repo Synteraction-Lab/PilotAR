@@ -96,7 +96,7 @@ class DevicePanel:
 
     def set_default_device_config(self, path):
         self.fpv_url = "192.168.31.144"
-        self.fpv_usr = "hellojanaka"
+        self.fpv_usr = "helloabc"
         self.fpv_pw = "testing1234"
         self.tpv_url = "0"
         self.browser_url = "figma.com"
