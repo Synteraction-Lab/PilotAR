@@ -9,8 +9,8 @@ from UI.widget_generator import get_bordered_frame, get_button, get_label
 
 
 class ConfirmBox(MessageBox):
-    def __init__(self, parent=None, text=None, font=None, width=300, height=200, on_click_yes_func=None):
-        super().__init__(parent, text, font, width, height)
+    def __init__(self, parent=None, text=None, font=None, width=300, height=200, on_click_yes_func=None, on_click_option_callback=None):
+        super().__init__(parent, text, font, width, height, callback=on_click_option_callback)
         self.on_click_yes_option_func = on_click_yes_func
 
     def pack_layout(self):
@@ -33,6 +33,7 @@ class ConfirmBox(MessageBox):
 
     def on_click_yes(self):
         if self.on_click_yes_option_func == None:
+            self.on_close_window()
             return 
         self.on_click_yes_option_func()
         self.on_close_window()

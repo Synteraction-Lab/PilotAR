@@ -9,7 +9,7 @@ from Utilities.screen_capture import get_second_monitor_original_pos
 
 
 class MessageBox:
-    def __init__(self, parent=None, text=None, font=None, width=160, height=150, workflow=None):
+    def __init__(self, parent=None, text=None, font=None, width=160, height=150, workflow=None, callback=None):
         # style = ttk.Style("darkly")
         self.root = Toplevel(parent)
         self.root.overrideredirect(True)
@@ -21,6 +21,7 @@ class MessageBox:
         self.pack_layout()
         self.root.attributes('-topmost', True)
         self.place_window_to_center()
+        self.callback = callback
 
 
     def pack_layout(self):
@@ -38,8 +39,10 @@ class MessageBox:
         self.close_btn.pack()
 
     def on_close_window(self):
-        if self.workflow is not None:
-            self.workflow.lower()
+        # if self.workflow is not None:
+        #     self.workflow.lower()
+        if self.callback is not None:
+            self.callback()
         self.root.destroy()
 
     def place_window_to_center(self):

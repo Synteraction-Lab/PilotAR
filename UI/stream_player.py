@@ -18,10 +18,10 @@ from Utilities.screen_capture import get_second_monitor_original_pos
 FPS_SCALE = 3
 
 class StreamPlayer:
-    def __init__(self, isFPV, ip="192.168.31.144", user="helloabc", pw="testing1234"):
+    def __init__(self, isFPV, ip="192.168.31.144", user="hellojanaka", pw="testing1234"):
         self.video_size = (1920, 1080)
-        self.NO_OF_GRID_ROWS = 5
-        self.NO_OF_GRID_COLS = 5
+        self.NO_OF_GRID_ROWS = 4
+        self.NO_OF_GRID_COLS = 4
         self.USERNAME = user
         self.PASSWORD = pw
         self.IP = ip
@@ -58,20 +58,21 @@ class StreamPlayer:
         self.sep = ttk.Separator(self.root, orient='horizontal')
         self.sep.pack(side="top", fill='x')
 
-        self.input_row_frame = ttk.Frame(self.root)
-        self.lbl = ttk.Label(self.input_row_frame, text=self.lbl_text, font='Helvetica 18 bold')
-        self.lbl.pack(side="left", padx=5)
-        self.ip_txt = EntryWithPlaceholder(master=self.input_row_frame, placeholder="Enter IP Address")
-        self.ip_txt.pack(side="left", padx=5)
-        self.load_btn = ttk.Button(self.input_row_frame, text="Load", command=self.load)
-        self.load_btn.pack(side="left", padx=5)
+        # self.input_row_frame = ttk.Frame(self.root)
+        # self.lbl = ttk.Label(self.input_row_frame, text=self.lbl_text, font='Helvetica 18 bold')
+        # self.lbl.pack(side="left", padx=5)
+        # self.ip_txt = EntryWithPlaceholder(master=self.input_row_frame, placeholder="Enter IP Address")
+        # self.ip_txt.pack(side="left", padx=5)
+        # self.load_btn = ttk.Button(self.input_row_frame, text="Load", command=self.load)
+        # self.load_btn.pack(side="left", padx=5)
         # self.input_row_frame.pack(side="top", anchor=W, pady=10)
         self.root.bind("<Configure>", self.resize)
+        self.root.attributes('-topmost', True)
         self.init_video_frame()
 
         t1 = threading.Thread(target=self.load)
         t1.start()
-        self.ip_txt.insert_text(self.IP)
+        # self.ip_txt.insert_text(self.IP)
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         self.root.mainloop()
 
@@ -103,8 +104,8 @@ class StreamPlayer:
 
     def load(self):
         print("start loading streaming")
-        if self.ip_txt.get_text() != "":
-            self.IP = self.ip_txt.get()
+        # if self.ip_txt.get_text() != "":
+        #     self.IP = self.ip_txt.get()
         self.set_cap()
 
         if self.cap is None or not self.cap.isOpened():

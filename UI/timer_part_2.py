@@ -114,7 +114,7 @@ class Timer_Part_2:
             correct_annotation = self.annotation_df[self.annotation_df['func']
                                                     == FUNC_LIST['correct']]
             self.annotations_counter_details[correct_annotation['type'].item()] = {
-                'func': FUNC_LIST['correct'], 'color': correct_annotation['color'].item(), 'value': 0, 'is_show': correct_annotation['is_show'].item(), 'label': None}
+                'func': FUNC_LIST['correct'], 'color': correct_annotation['color'].item(), 'value': 0, 'is_show': correct_annotation['is_show'].item(), 'label': None, 'key': correct_annotation['key'].item()}
             is_show_accuracy = True if (
                 correct_annotation['is_show'] == True).bool() else is_show_accuracy
 
@@ -122,25 +122,27 @@ class Timer_Part_2:
             incorrect_annotation = self.annotation_df[self.annotation_df['func']
                                                       == FUNC_LIST['incorrect']]
             self.annotations_counter_details[incorrect_annotation['type'].item()] = {
-                'func': FUNC_LIST['incorrect'], 'color': incorrect_annotation['color'].item(), 'value': 0, 'is_show': incorrect_annotation['is_show'].item(), 'label': None}
+                'func': FUNC_LIST['incorrect'], 'color': incorrect_annotation['color'].item(), 'value': 0, 'is_show': incorrect_annotation['is_show'].item(), 'label': None, 'key': incorrect_annotation['key'].item()}
             is_show_accuracy = True if (
                 incorrect_annotation['is_show'] == True).bool() else is_show_accuracy
 
         if self.annotations_counter_details.get('Accuracy') == None:
             self.annotations_counter_details['accuracy'] = {
                 'func': 'Accuracy', 'color': 'white', 'value': 'N.A.', 'is_show': is_show_accuracy, 'label': None}
-            
+
         for index, row in self.annotation_df.iterrows():
             if row['func'] == FUNC_LIST['voice']:
                 continue
-            # add it to dict (self.annotations_counter_details) if not yet added (dict's key - type, value - dict of key value pairs for 'func', 'color', 'value', 'is_show', 'label')
+            # add it to dict (self.annotations_counter_details) if not yet added (dict's key - type, value - dict of key value pairs for 'func', 'color', 'value', 'is_show', 'label', 'key')
             if self.annotations_counter_details.get(row['type']) == None:
                 self.annotations_counter_details[row['type']] = {
                     'func': row['func'], 'color': row['color'], 'value': 0, 'is_show': row['is_show'], 'label': None}
             else:
                 self.annotations_counter_details[row['type']
                                                  ]['is_show'] = row['is_show']
-                
+            
+            self.annotations_counter_details[row['type']]['key'] = row['key']
+
     def update_annotation_counter_details(self):
         self.annotation_df = get_customized_annotation_df()
         is_show_accuracy = False
@@ -149,10 +151,10 @@ class Timer_Part_2:
                 continue
             if (row['func'] == FUNC_LIST['correct'] or row['func'] == FUNC_LIST['incorrect']) and row['is_show']:
                 is_show_accuracy = True
-            self.annotations_counter_details[row['type']]['is_show'] = row['is_show']
+            self.annotations_counter_details[row['type']
+                                             ]['is_show'] = row['is_show']
         self.annotations_counter_details['accuracy']['is_show'] = is_show_accuracy
         self.generate_annotations_counter_labels()
-
 
     def set_screen_capture(self, screen_capture):
         self.screen_capture = screen_capture
@@ -245,6 +247,9 @@ class Timer_Part_2:
     # Listen the key press
     def on_press(self, key):
         if not (self.is_started and str(key).strip("''").lower() in self.hot_keys.keys()):
+            return
+        
+        if self.image_note_window_status:
             return
 
         color = self.hot_keys[str(key).strip("''").lower()]['color']
@@ -345,6 +350,7 @@ class Timer_Part_2:
     def update_accuracy_true(self, color="green"):
         self.update_accuracy(True)
         timeDelta = self.timeDelta
+        self.capture_screen(timeDelta)
         self.mark(timeDelta, color)
         log_utilities.log_manipulation_info(
             self.get_pid(), timeDelta, self.CORRECT_TYPE_NAME, FUNC_LIST['correct'], color)
@@ -352,9 +358,10 @@ class Timer_Part_2:
     def update_accuracy_false(self, color="red"):
         self.update_accuracy(False)
         timeDelta = self.timeDelta
+        self.capture_screen(timeDelta)
         self.mark(timeDelta, color)
-        log_utilities.log_manipulation_info(self.get_pid(
-        ), timeDelta, self.INCORRECT_TYPE_NAME, FUNC_LIST['incorrect'], color)
+        log_utilities.log_manipulation_info(self.get_pid(), timeDelta,
+                                            self.INCORRECT_TYPE_NAME, FUNC_LIST['incorrect'], color)
 
     def start_listener(self):
         self.keyboard_listener = KeyListener()
@@ -395,26 +402,36 @@ class Timer_Part_2:
             self.progress()
         self.now_time_label.after(1000, self.update_time)
 
-    # Mark the important moment
-    def set_time_index(self, color="blue"):
-        if not self.is_started:
-            return
-        time_stamp = self.timeDelta
+    def capture_screen(self, time_stamp):
         if self.screen_capture is not None:
             self.screen_capture.take_screenshot(time_stamp.replace(':', '_'))
             self.no_of_screenshots_whole += 1
             self.show_image_captured_preview(time_stamp.replace(':', '_'))
         else:
             get_messagebox(self.root, "Screen capture is not activated!")
+
+    # Mark the important moment
+    def set_time_index(self, color="blue"):
+        if not self.is_started:
+            return
+        time_stamp = self.timeDelta
+        self.capture_screen(time_stamp)
         # Add Marker to timer
         self.mark(time_stamp, color)
         log_utilities.log_manipulation_info(self.get_pid(), time_stamp, self.SCREENSHOT_TYPE_NAME,
                                             FUNC_LIST['screenshot_whole'], color)
         screenshot_whole_annotation_type = self.annotation_df[self.annotation_df['func']
-                                                    == FUNC_LIST['screenshot_whole']]['type'].item()
+                                                              == FUNC_LIST['screenshot_whole']]['type'].item()
         self.annotations_counter_details[screenshot_whole_annotation_type]['value'] = self.no_of_screenshots_whole
         self.annotations_counter_details[screenshot_whole_annotation_type]['label'].configure(
-            text=screenshot_whole_annotation_type + ": " + str(self.annotations_counter_details[screenshot_whole_annotation_type]['value']))
+            text=self.get_annotation_display_label(screenshot_whole_annotation_type))
+
+    def get_annotation_display_label(self, annotation_type):
+        label_text = annotation_type + "= " + str(self.annotations_counter_details[annotation_type]['value'])
+        key_code = self.annotations_counter_details[annotation_type].get('key', None)
+        if key_code is not None:
+            label_text += "\n(key: " + str(key_code) + ")"
+        return label_text
 
     # Set index for screenshot with selected region
     def set_time_index_with_roi(self):
@@ -439,10 +456,11 @@ class Timer_Part_2:
         log_utilities.log_manipulation_info(self.get_pid(), time_stamp, self.SCREENSHOT_ROI_TYPE_NAME,
                                             FUNC_LIST['screenshot_roi'], color)
         screenshot_roi_annotation_type = self.annotation_df[self.annotation_df['func']
-                                                    == FUNC_LIST['screenshot_roi']]['type'].item()
+                                                            == FUNC_LIST['screenshot_roi']]['type'].item()
         self.annotations_counter_details[screenshot_roi_annotation_type]['value'] = self.no_of_screenshots_roi
         self.annotations_counter_details[screenshot_roi_annotation_type]['label'].configure(
-            text=screenshot_roi_annotation_type + ": " + str(self.annotations_counter_details[screenshot_roi_annotation_type]['value']))
+            text=self.get_annotation_display_label(screenshot_roi_annotation_type))
+
 
     def enable_screenshot_flag(self):
         if (not self.is_started) or self.is_selection_window_existed:
@@ -470,10 +488,10 @@ class Timer_Part_2:
                                                 "\"{}\"".format(
                                                     {'x': center_coordinates[0], 'y': center_coordinates[1]}))
             mark_annotation_type = self.annotation_df[self.annotation_df['func']
-                                                    == FUNC_LIST['mark']]['type'].item()
+                                                      == FUNC_LIST['mark']]['type'].item()
             self.annotations_counter_details[mark_annotation_type]['value'] = self.no_of_marks
             self.annotations_counter_details[mark_annotation_type]['label'].configure(
-                text=mark_annotation_type + ": " + str(self.annotations_counter_details[mark_annotation_type]['value']))
+                text=self.get_annotation_display_label(mark_annotation_type))
         else:
             get_messagebox(self.root, "Screen capture is not activated!")
         self.marking_flag = False
@@ -505,7 +523,7 @@ class Timer_Part_2:
         self.annotations_counter_details[annotation_type
                                          ]['value'] += 1
         self.annotations_counter_details[annotation_type]['label'].configure(
-            text=annotation_type + ": " + str(self.annotations_counter_details[annotation_type]['value']))
+            text=self.get_annotation_display_label(annotation_type))
 
     # ProgressBar component
     def create_progress_bar(self, root):
@@ -584,7 +602,7 @@ class Timer_Part_2:
         # self.startTime.set('Start: ' + self.get_now_time_string(mode='start'))
         self.get_now_time_string(mode="start")
         log_utilities.log_manipulation_info(
-            self.get_pid(), "00:00:00", "Start", "Start")
+            self.get_pid(), "00:00:00", "Start", "Start", manipulation_note=datetime.utcnow())
 
     def on_stop(self):
         if not self.is_started:
@@ -624,23 +642,23 @@ class Timer_Part_2:
             #     "Accuracy: {:.2f}%".format(self.current_accuracy))
 
             correct_annotation_type = self.annotation_df[self.annotation_df['func']
-                                                    == FUNC_LIST['correct']]['type'].item()
+                                                         == FUNC_LIST['correct']]['type'].item()
             self.annotations_counter_details[correct_annotation_type]['value'] = self.trial_record['correct_trial']
             incorrect_annotation_type = self.annotation_df[self.annotation_df['func']
-                                                    == FUNC_LIST['incorrect']]['type'].item()
+                                                           == FUNC_LIST['incorrect']]['type'].item()
             self.annotations_counter_details[incorrect_annotation_type]['value'] = incorrect_trial
             self.annotations_counter_details['accuracy']['value'] = "{:.2f}%".format(
                 self.current_accuracy)
             self.annotations_counter_details[correct_annotation_type]['label'].configure(
-                text=correct_annotation_type + ": " + str(self.annotations_counter_details[correct_annotation_type]['value']))
+                text=self.get_annotation_display_label(correct_annotation_type))
             self.annotations_counter_details[incorrect_annotation_type]['label'].configure(
-                text=incorrect_annotation_type + ": " + str(self.annotations_counter_details[incorrect_annotation_type]['value']))
+                text=self.get_annotation_display_label(incorrect_annotation_type))
             self.annotations_counter_details['accuracy']['label'].configure(
-                text='accuracy' + ": " + str(self.annotations_counter_details['accuracy']['value']))
+                text=self.get_annotation_display_label('accuracy'))
 
     def reset_accuracy(self):
         # self.accuracyText.set("Correct: {}\nIncorrect: {}".format(self.CORRECT_ACTION_KEY, self.INCORRECT_ACTION_KEY))
-        self.accuracyText.set("Accuracy: NIL")
+        self.accuracyText.set("Accuracy= NIL")
         self.trial_record['total_trial'] = 0
         self.trial_record['correct_trial'] = 0
 
@@ -681,14 +699,16 @@ class Timer_Part_2:
         column_no = 0
         row_no = 0
         no_of_columns_per_row = 2
+
         for key in self.annotations_counter_details:
-            annotation = self.annotations_counter_details[key]
-            label = get_label(self.annotations_counter_frame, None,
-                              key + ": " + str(annotation['value']))
+            label_text = self.get_annotation_display_label(key)
+            label = get_label(self.annotations_counter_frame, None, label_text)
+            label.configure(wraplength=180, justify='left')
+
             label.configure(fg=UI.color.color_translation(
-                annotation['color']), anchor='w')
+                self.annotations_counter_details[key]['color']), anchor='w')
             self.annotations_counter_details[key]['label'] = label
-            if not annotation['is_show']:
+            if not self.annotations_counter_details[key]['is_show']:
                 continue
             label.grid(column=column_no, row=row_no,
                        pady=5, padx=5, sticky="nsew")
@@ -723,7 +743,7 @@ class Timer_Part_2:
 
         self.pid_frame = Frame(self.workflow.top_right_frame)
         self.pid_frame.grid(column=0, row=0, columnspan=2,
-                            rowspan=1, padx=50, pady=20, sticky="w")
+                            rowspan=1, padx=10, pady=20, sticky="w")
         # self.pid_label = get_label(self.workflow.top_right_frame, text="Participant & Session ID: {}".format(self.pid))
         self.pid_label = get_label(
             self.pid_frame, text="Participant & Session ID: ")
@@ -739,7 +759,7 @@ class Timer_Part_2:
 
         self.duration_frame = Frame(self.workflow.top_right_frame)
         self.duration_frame.grid(
-            column=0, row=1, columnspan=2, rowspan=1, padx=50, pady=20, sticky="w")
+            column=0, row=1, columnspan=2, rowspan=1, padx=10, pady=20, sticky="w")
         self.duration_label = get_label(
             self.duration_frame, text="Duration (min): ")
         self.duration_label.grid(

@@ -545,8 +545,13 @@ class Player(Tk.Frame):
         width = get_monitors()[selected_monitor_idx].width
         height = get_monitors()[selected_monitor_idx].height
         self.player.video_take_snapshot(0, save_location_path, width, height)
+        if not os.path.exists(save_location_path):
+            print("First try of screenshot is not taken, re-taking screenshot of video")
+            self.player.video_take_snapshot(0, save_location_path, width, height)
 
-
+    def setSpeed(self, speed):
+        rate = float(speed.replace('x', ''))
+        self.player.set_rate(rate)
 
 if __name__ == "__main__":
 

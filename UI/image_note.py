@@ -9,6 +9,7 @@ from PIL import ImageTk, Image
 
 from UI.widget_generator import get_bordered_frame, get_button, get_text
 from Utilities.screen_capture import get_second_monitor_original_pos
+from Utilities.log_utilities import get_manipulation_log_file
 
 
 class ImageNoteWindow:
@@ -31,7 +32,7 @@ class ImageNoteWindow:
         self.place_window_to_center()
 
     def load_data_file(self):
-        self.file_path = os.path.join(self.folder_path, 'task_info.csv')
+        self.file_path = get_manipulation_log_file(self.pid)
         self.df = pd.read_csv(self.file_path)
 
     def get_text_from_file(self):

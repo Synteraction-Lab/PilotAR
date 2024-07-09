@@ -9,6 +9,7 @@ from ttkbootstrap.constants import *
 
 from UI.analyser import setup_new_analyzer
 from UI.configuration_panel import ConfigurationPanel
+from UI.role_selection_window import RoleSelectionWindow
 from UI.timer_part_1 import Timer_Part_1
 from UI.widget_generator import get_button, get_bordered_frame, get_messagebox
 from UI.UI_config import MAIN_COLOR_LIGHT, BUTTON_FG_COLOR
@@ -36,6 +37,7 @@ class WorkflowPanel:
         self.is_analyzer_window_running = False
         self.key_listener = KeyListener()
         self.key_listener.start_listener()
+        self.load_role_selection_window()
 
     def load_configuration(self):
         if not self.is_setup_window_running:
@@ -120,6 +122,9 @@ class WorkflowPanel:
 
     def lower(self, event=None):
         self.root.lower()
+
+    def load_role_selection_window(self):
+        self.role_selection_window = RoleSelectionWindow(self.root)
 
     def pack_layout(self):
         self.top_view = Frame(self.root)

@@ -13,7 +13,8 @@ from pynput.keyboard import Listener as KeyboardListener
 import UI.color
 from UI.widget_generator import get_button, get_dropdown_menu, get_bordered_frame, get_entry_with_placeholder, \
     get_messagebox, get_label
-from UI.custom_table import CustomTable
+from UI.custom_table_old import CustomTable
+from UI.annotations_customization_table import AnnotationsCustomizationTable
 from UI.UI_config import MAIN_FONT, COLOR_THEME
 from Utilities import log_utilities
 from Utilities.annotation_utilities import FILE_NAME, set_default_annotations, FUNC_LIST, update_current_annotation_df_for_is_show
@@ -30,6 +31,7 @@ class CustomizationPanel:
         self.selected_func = None
         self.key_press_flag = False
         self.is_run_alone = is_run_alone
+        self.is_selected_row = False
         if configuration_panel != None:
             self.workflow = configuration_panel.workflow
         else:
@@ -118,7 +120,7 @@ class CustomizationPanel:
             is_show = row[4] == 'True'
         if self.check_key_conflicts(annotation_type, key) == 1:
             get_messagebox(
-                self.root, "Detect key conflicts in the config file!", workflow=self.workflow)
+                self.root, "Detect key conflicts in the config file!", workflow=self.workflow, callback=self.messagebox_callback)
             return
 
         if annotation_type not in self.customized_annotations.keys():
@@ -133,11 +135,11 @@ class CustomizationPanel:
         return any(annotation != item and key == self.customized_annotations[item]['key'] for item in
                    self.customized_annotations)
 
-    def check_func_conflicts(self, func):
+    def has_func_conflicts(self, func):
         for item in self.customized_annotations:
             if func == self.customized_annotations[item]['func'] and func != FUNC_LIST['counter']:
-                return 0
-        return 1
+                return True
+        return False
 
     def insert_annotation(self, annotation_type, key, color, func, is_show):
         item_uuid = self.customized_annotations[annotation_type]['id']
@@ -158,12 +160,12 @@ class CustomizationPanel:
             # self.annotations_table.insert(parent='', index='end',
             #                               iid=self.customized_annotations[annotation_type]['id'],
             #                               text='', values=(annotation_type, key, color), tags=(annotation_type,))
-            cells = [{"value": func, "fg": "white", "anchor": "center", "tag": ""},
+            cells = [{"value": func, "fg": "white", "anchor": "center", "tag": "func"},
                      {"value": annotation_type, "fg": "white",
-                         "anchor": "center", "tag": ""},
-                     {"value": key, "fg": "white", "anchor": "center", "tag": ""},
+                         "anchor": "center", "tag": "type"},
+                     {"value": key, "fg": "white", "anchor": "center", "tag": "key"},
                      {"value": color, "fg": UI.color.color_translation(
-                         color), "anchor": "center", "tag": ""},
+                         color), "anchor": "center", "tag": "color"},
                      {"value": is_show, "anchor": "center", "tag": ""},
                      {"anchor": "center", "tag": ""},]
             self.annotations_table.insert(
@@ -188,14 +190,48 @@ class CustomizationPanel:
         for annotation_type in self.customized_annotations.keys():
             if annotation_type == annotation["type"]:
                 continue
-            updated_annotations.append({"type": annotation_type, "key": self.customized_annotations[annotation_type]["key"], "color": self.customized_annotations[annotation_type]["color"], "func": self.customized_annotations[annotation_type]["func"], "is_show": self.customized_annotations[annotation_type]["is_show"]})
-        
+            updated_annotations.append({"type": annotation_type, "key": self.customized_annotations[annotation_type]["key"], "color": self.customized_annotations[
+                                       annotation_type]["color"], "func": self.customized_annotations[annotation_type]["func"], "is_show": self.customized_annotations[annotation_type]["is_show"]})
+
         df = pd.DataFrame(updated_annotations)
         file_path = os.path.join("data", 'customization.csv')
         df.to_csv(file_path, index=False, quoting=csv.QUOTE_MINIMAL)
 
         del self.customized_annotations[annotation["type"]]
 
+    def on_click_insert(self):
+        annotation_type, key, color, func = self.type_entry.get_text(), self.key_txt.get(), self.color_txt.get(), \
+            self.func_txt.get()
+        is_show = True
+        if self.workflow is not None:
+            self.workflow.lower()
+
+        if func == "Select Function Here":
+            get_messagebox(self.root, "Please select a function!", workflow=self.workflow, callback=self.messagebox_callback)
+            return
+
+        if self.check_key_conflicts(annotation_type, key) == 1:
+            get_messagebox(self.root, "Please change the key!", workflow=self.workflow, callback=self.messagebox_callback)
+            return
+
+        if self.has_func_conflicts(func):
+            get_messagebox(
+                self.root, "Only support 1 annotation for func: \"{}\"!".format(func), workflow=self.workflow, callback=self.messagebox_callback)
+            return
+        
+        self.customized_annotations.update({annotation_type: {'key': key, 'color': color, 'id': uuid.uuid4(),
+                                                                'func': func, 'is_show': is_show}})
+        log_utilities.record_customized_annotations(self.path, annotation_type,
+                                                    self.customized_annotations[annotation_type]['key'],
+                                                    self.customized_annotations[annotation_type]['color'],
+                                                    self.customized_annotations[annotation_type]['func'],
+                                                    self.customized_annotations[annotation_type]['is_show'])
+        self.insert_annotation(annotation_type, key, color, func, is_show)
+
+        get_messagebox(self.root, "Successfully Insert!",
+                       workflow=self.workflow, callback=self.messagebox_callback)
+
+    """ buggy and too complicated
     def update_annotation(self):
         annotation_type, key, color, func = self.type_entry.get_text(), self.key_txt.get(), self.color_txt.get(), \
             self.func_txt.get()
@@ -204,15 +240,20 @@ class CustomizationPanel:
             self.workflow.lower()
 
         if self.check_key_conflicts(annotation_type, key) == 1:
-            get_messagebox(self.root, "Please change the key!", workflow=self.workflow)
+            get_messagebox(self.root, "Please change the key!",
+                           workflow=self.workflow, callback=self.messagebox_callback)
             return
 
-        if self.check_key_conflicts(annotation_type, key) != -1 and not self.check_func_conflicts(func):
+        # updating existing entry + change of func so must not have func conflict else violates
+        # or inserting new entry so must not have func conflict else violates
+        if (annotation_type in self.customized_annotations.keys() and self.selected_func != func and self.has_func_conflicts(func)) or\
+                (annotation_type not in self.customized_annotations.keys() and self.has_func_conflicts(func)):
             get_messagebox(
-                self.root, "Only support 1 annotation for func: \"{}\"!".format(func), workflow=self.workflow)
+                self.root, "Only support 1 annotation for func: \"{}\"!".format(func), workflow=self.workflow, callback=self.messagebox_callback)
             return
 
         df = pd.read_csv(self.path)
+        # updating existing entry (same annotation type but different values for other properties)
         if annotation_type in self.customized_annotations.keys():
             self.customized_annotations[annotation_type]['key'] = key
             self.customized_annotations[annotation_type]['color'] = color
@@ -221,6 +262,7 @@ class CustomizationPanel:
             df.loc[df['type'] == annotation_type, ['color']] = color
             df.loc[df['type'] == annotation_type, ['func']] = func
             df.to_csv(self.path, index=False)
+        # updating existing entry's (new annotation type and others)
         elif self.check_key_conflicts(annotation_type, key) == -1:
             delete_item = None
             prev_uuid = None
@@ -236,7 +278,7 @@ class CustomizationPanel:
             df.loc[df['key'] == key, ['color']] = color
             df.loc[df['key'] == key, ['func']] = func
             df.to_csv(self.path, index=False)
-        else:
+        else:  # insert new entry
             self.customized_annotations.update({annotation_type: {'key': key, 'color': color, 'id': uuid.uuid4(),
                                                                   'func': func, 'is_show': is_show}})
             log_utilities.record_customized_annotations(self.path, annotation_type,
@@ -246,7 +288,16 @@ class CustomizationPanel:
                                                         self.customized_annotations[annotation_type]['is_show'])
 
         self.insert_annotation(annotation_type, key, color, func, is_show)
-        get_messagebox(self.root, "Successfully Update!", workflow=self.workflow)
+
+        get_messagebox(self.root, "Successfully Update!",
+                       workflow=self.workflow, callback=self.messagebox_callback)
+    """
+
+    def messagebox_callback(self):
+        # self.root.attributes("-topmost", True)
+        # self.root.focus()
+        self.root.attributes('-topmost', 1)
+        self.root.attributes('-topmost', 0)
 
     def get_customized_annotations(self):
         return self.customized_annotations
@@ -260,15 +311,74 @@ class CustomizationPanel:
     #     self.key_txt.set(row_values[1])
     #     self.color_txt.set(row_values[2])
 
-    def on_clicked_row(self, row_obj):
-        self.type_entry.set_text(row_obj["type"])
-        self.key_txt.set(row_obj["key"])
-        self.color_txt.set(row_obj["color"])
-        self.func_txt.set(row_obj["func"])
-        self.selected_type = row_obj["type"]
-        self.selected_key = row_obj["key"]
-        self.selected_color = row_obj["color"]
-        self.selected_func = row_obj["func"]
+    # def on_clicked_row(self, row_obj):
+    #     self.type_entry.set_text(row_obj["type"])
+    #     self.key_txt.set(row_obj["key"])
+    #     self.color_txt.set(row_obj["color"])
+    #     self.func_txt.set(row_obj["func"])
+    #     self.selected_type = row_obj["type"]
+    #     self.selected_key = row_obj["key"]
+    #     self.selected_color = row_obj["color"]
+    #     self.selected_func = row_obj["func"]
+
+    #     self.is_selected_row = True
+
+    # def on_unclick_row(self):
+    #     self.is_selected_row = False
+
+    def on_edit_func_callback(self, original_func, updated_func, annotation_type):
+        if original_func == updated_func:
+            return False
+        
+        if self.has_func_conflicts(updated_func):
+            get_messagebox(
+                self.root, "Only support 1 annotation for func: \"{}\"!".format(updated_func), workflow=self.workflow, callback=self.messagebox_callback)
+            return False
+        
+        self.customized_annotations[annotation_type]['func'] = updated_func
+        df = pd.read_csv(self.path)
+        df.loc[df['type'] == annotation_type, ['func']] = updated_func
+        df.to_csv(self.path, index=False)
+        return True
+
+    def on_edit_type_callback(self, original_type, updated_type, annotation_key):
+        if original_type == updated_type:
+            return False
+        
+        if updated_type in self.customized_annotations.keys():
+            get_messagebox(self.root, "Please change annotation type!", workflow=self.workflow, callback=self.messagebox_callback)
+            return False
+        
+        values = self.customized_annotations[original_type]
+        self.customized_annotations[updated_type] = values
+        del self.customized_annotations[original_type] 
+        df = pd.read_csv(self.path)
+        df.loc[df['key'] == annotation_key, ['type']] = updated_type
+        df.to_csv(self.path, index=False)
+        return True
+
+        
+    def on_edit_key_callback(self, original_key, updated_key, annotation_type):
+        if original_key == updated_key:
+            return False
+
+        if self.check_key_conflicts(annotation_type, updated_key) == 1:
+            get_messagebox(self.root, "Please change the key!", workflow=self.workflow, callback=self.messagebox_callback)
+            return False
+        
+        self.customized_annotations[annotation_type]['key'] = updated_key
+        df = pd.read_csv(self.path)
+        df.loc[df['type'] == annotation_type, ['key']] = updated_key
+        df.to_csv(self.path, index=False)
+        return True
+    
+
+    def on_edit_color_callback(self, updated_color, annotation_type):
+        self.customized_annotations[annotation_type]['color'] = updated_color
+        df = pd.read_csv(self.path)
+        df.loc[df['type'] == annotation_type, ['color']] = updated_color
+        df.to_csv(self.path, index=False)
+
 
     def on_close_window(self):
         self.root.destroy()
@@ -286,9 +396,12 @@ class CustomizationPanel:
         self.annotations_table_frame.pack(pady=5)
         self.annotations_table_frame.pack_propagate(0)
 
-        self.annotations_table = CustomTable(self.annotations_table_frame, on_clicked_row_func=self.on_clicked_row,
-                                             on_clicked_multi_row_func=None, row_height=35, header_height=35,
-                                             header_text_color="white", delete_func=self.delete_annotation, on_click_pin_func=self.on_click_pin)
+
+        self.annotations_table = AnnotationsCustomizationTable(parent=self.annotations_table_frame, row_height=35, header_height=35, header_text_color="white",
+                                                               on_delete_callback=self.delete_annotation, on_click_pin_callback=self.on_click_pin,
+                                                               messagebox_callback=self.messagebox_callback, on_edit_type_callback=self.on_edit_type_callback,
+                                                               on_edit_key_callback=self.on_edit_key_callback, on_edit_func_callback=self.on_edit_func_callback,
+                                                               on_edit_color_callback=self.on_edit_color_callback)
         self.annotations_table.define_column_ids(
             ["func", "type", "key", "color", "pin", "delete"])
         self.annotations_table.column(
@@ -312,7 +425,7 @@ class CustomizationPanel:
 
         self.motification_panel = ttk.Frame(self.root_frame)
         self.motification_panel.pack()
-        self.add_btn = get_button(self.motification_panel, text="Update", command=self.update_annotation,
+        self.add_btn = get_button(self.motification_panel, text="Insert", command=self.on_click_insert,
                                   pattern=0)
         self.add_btn.grid(column=8, row=1, columnspan=1, padx=10, pady=10)
 
@@ -363,7 +476,7 @@ class CustomizationPanel:
             self.motification_panel, textvariable=self.func_txt)
 
         func_options = list(FUNC_LIST.values())
-        print(func_options)
+        # print(func_options)
         self.func_options = get_dropdown_menu(
             self.motification_panel, values=func_options, variable=self.func_txt)
 

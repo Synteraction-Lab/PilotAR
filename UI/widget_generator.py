@@ -109,9 +109,9 @@ def get_label(root, textvariable=None, text=None, pattern=0):
         return tk.Label(root, text=text, font=font)
 
 
-def get_messagebox(root, text, font=UI.UI_config.MESSAGEBOX_FONT, workflow=None):
+def get_messagebox(root, text, font=UI.UI_config.MESSAGEBOX_FONT, workflow=None, callback=None):
     from UI.messagebox import MessageBox
-    return MessageBox(root, text, font=font, workflow=workflow)
+    return MessageBox(root, text, font=font, workflow=workflow, callback=callback)
 
 
 def get_slider(root, command, variable, orient):

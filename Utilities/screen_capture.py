@@ -38,7 +38,7 @@ def get_marked_frame_info(mark_frames_no):
 def add_circular_mark_to_video(mark_frames_no, path):
     while True:
         try:
-            videoCapture = cv2.VideoCapture(os.path.join(path, 'output.mp4'))
+            videoCapture = cv2.VideoCapture(os.path.join(path, 'experiment.mp4'))
             break
         except:
             print("video is not ready")
@@ -162,15 +162,15 @@ class ScreenCapture:
         self.load_config()
         if get_system_name() == "Windows":
             self.recording_cmd = 'ffmpeg -f dshow -i audio=\"{}\" -f dshow -i audio=\"{}\" -f gdigrab -framerate 12 -draw_mouse 1 -i desktop -filter_complex \"[0:a][1:a]amerge=inputs=2[a]\" -map 2 -map \"[a]\" -f mp4 {}'.format(
-                self.AUDIO_DEVICES_IDX_1, self.AUDIO_DEVICES_IDX_2, os.path.join(self.path, "output.mp4"))
+                self.AUDIO_DEVICES_IDX_1, self.AUDIO_DEVICES_IDX_2, os.path.join(self.path, "experiment.mp4"))
 
         elif get_system_name() == "Linux":
             self.recording_cmd = 'ffmpeg -video_size 1024x768 -framerate 12 -f x11grab -i :0.0+100,200 -f pulse -ac 2 -i default {}'.format(
-                os.path.join(self.path, "output.mpr"))
+                os.path.join(self.path, "experiment.mpr"))
 
         elif get_system_name() == "Darwin":
             self.recording_cmd = 'ffmpeg -f avfoundation -capture_cursor 1 -i "{}":"{}" -r 12 {}'.format(
-                self.VIDEO_SOURCE_IDX, self.AUDIO_DEVICES_IDX, os.path.join(self.path, "output.mp4"))
+                self.VIDEO_SOURCE_IDX, self.AUDIO_DEVICES_IDX, os.path.join(self.path, "experiment.mp4"))
         # self.recording_cmd = self.recording_cmd.split(" ")
         self.process = subprocess.Popen(self.recording_cmd, stdin=subprocess.PIPE, shell=True)
 

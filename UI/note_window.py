@@ -1,4 +1,5 @@
 import sys
+
 sys.path.append("./")
 import tkinter
 from tkinter import WORD, Toplevel, Frame
@@ -6,11 +7,11 @@ from UI.task import Task
 from UI.widget_generator import get_bordered_frame, get_bordered_label_frame, get_button, get_text
 from Utilities.screen_capture import get_second_monitor_original_pos
 import os
-import pandas as pd
-import csv 
+
 
 class NoteWindow:
-    def __init__(self, pid="p1_1",parent=None, on_close_note_window_func=None, font=None, task=None, width=160, height=150):
+    def __init__(self, pid="p1_1", parent=None, on_close_note_window_func=None, font=None, task=None, width=160,
+                 height=150):
         self.parent = parent
         self.root = Toplevel()
         self.root.wait_visibility()
@@ -27,11 +28,7 @@ class NoteWindow:
         self.place_window_to_center()
 
     def save(self, notes):
-        file_path = os.path.join(self.folder_path, 'task_info.csv')
-        df = pd.read_csv(file_path)
-        df.loc[(df['time'] == self.task.get_timestamp()) & (df['type'] == self.task.get_display_type()) & (df['note'] == self.task.get_notes()), 'note'] = notes
         self.task.set_notes(notes)
-        df.to_csv(file_path, index=False, quoting=csv.QUOTE_MINIMAL)
 
     def pack_layout(self):
         self.main_frame = get_bordered_frame(self.root)
@@ -68,12 +65,12 @@ class NoteWindow:
                             (get_second_monitor_original_pos()[2] - self.root.winfo_width()) // 2,
                             get_second_monitor_original_pos()[1] +
                             (get_second_monitor_original_pos()[3] - self.root.winfo_height()) // 2))
-        
 
 
 if __name__ == '__main__':
     root = tkinter.Tk()
-    t1= Task(2, "00:00:01", "voice", "N.A.", "once upon a time there was an old mother pig who had trained litter pick and not enough to defeat them so and they were all now she said the or into the was sick their fortunes")
+    t1 = Task(2, "00:00:01", "voice", "N.A.",
+              "once upon a time there was an old mother pig who had trained litter pick and not enough to defeat them so and they were all now she said the or into the was sick their fortunes")
 
     NoteWindow(root, task=t1, pid="p15_1")
     # root.mainloop()

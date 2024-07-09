@@ -686,7 +686,7 @@ def _load_audio_waveform(audio: Union[str, bytes, np.ndarray, torch.Tensor], h: 
                 .output('-', pix_fmt='gray', format='rawvideo')
                 .run(cmd="ffmpeg", capture_stdout=True, capture_stderr=True, input=inp)
         )
-    except ffmpeg.Error as e:
+    except Exception as e:
         raise RuntimeError(f"Failed to load audio in waveform: {e.stderr.decode()}") from e
     else:
         if not waveform:

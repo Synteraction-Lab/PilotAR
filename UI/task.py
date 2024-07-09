@@ -1,16 +1,18 @@
 import ast
 import os
 import pandas as pd
+import csv
 
-from Utilities.annotation_utilities import FUNC_START, FUNC_STOP, FUNC_LIST
-
+from Utilities.annotation_utilities import FUNC_START, FUNC_STOP, FUNC_LIST, FUNC_WITH_SCREENSHOT
+from Utilities.common_utilities import get_role
 
 class Task:
-    def __init__(self, id, timestamp, type, func, color, data, notes, folder_path=os.path.join("data", "p1_1"),
+    def __init__(self, id, timestamp, type, func, color, data, notes, role, realtime, folder_path=os.path.join("data", "p1_1"),
                  is_bumped=False):
         self.id = id
         self.is_bumped = is_bumped
         self.timestamp = timestamp
+        self.realtime = realtime
         str(self.timestamp).zfill(8)
         self.data = data
         self.display_type = type
@@ -18,10 +20,11 @@ class Task:
         self.color = color
         self.notes = notes
         self.folder_path = folder_path
+        self.role = role
         self.image_file_name = ""
         self.is_selected = True
         self.type_colors = {}
-        if func == FUNC_LIST['screenshot_whole'] or func == FUNC_LIST['screenshot_roi']:
+        if func in [FUNC_LIST['screenshot_whole'], FUNC_LIST['screenshot_roi'], FUNC_LIST['correct'], FUNC_LIST['incorrect']]:
             self.image_file_name = self.timestamp.replace(":", "_")
         elif func == FUNC_LIST['mark']:
             self.coordinates = ast.literal_eval(data)
@@ -30,6 +33,10 @@ class Task:
             self.func = FUNC_START
         elif type == "stop":
             self.func = FUNC_STOP
+        if role == 'Wizard': 
+            self.image_file_name = 'wizard_' + self.image_file_name
+        if role == 'Observer':
+            self.image_file_name = 'observer_' + self.image_file_name
 
     def get_id(self):
         return self.id
@@ -45,8 +52,7 @@ class Task:
 
     def set_timestamp(self, timestamp):
         self.timestamp = timestamp
-        if self.func == FUNC_LIST['screenshot_whole'] or self.func == FUNC_LIST['screenshot_roi'] \
-                or self.func == FUNC_LIST['mark']:
+        if self.func in FUNC_WITH_SCREENSHOT:
             updated_file_name = self.timestamp.replace(":", "_")
             os.rename(os.path.join(self.folder_path, self.image_file_name + ".png"),
                       os.path.join(self.folder_path, updated_file_name + ".png"))
@@ -106,13 +112,18 @@ class Task:
     def set_is_selected(self, is_selected):
         self.is_selected = is_selected
 
+    def get_role(self):
+        return self.role
+
     def __str__(self):
-        return "Id: {}, Time: {}, Type: {}, FUNC: {}, Color: {}, Data: {}, Notes: {}, Is Bumped: {}".format(self.id,
+        return "Id: {}, Time: {}, Type: {}, FUNC: {}, Color: {}, Data: {}, Notes: {}, Is Bumped: {}, Role: {}, Realtime: {}".format(self.id,
                                                                                                  self.timestamp,
                                                                                                  self.display_type,
                                                                                                  self.func, self.color,
                                                                                                  self.data, self.notes,
-                                                                                                 self.is_bumped)
+                                                                                                 self.is_bumped,
+                                                                                                 self.role, 
+                                                                                                 self.realtime)
 
     def to_dict(self):
         dict = {
@@ -122,6 +133,8 @@ class Task:
             'color': self.color,
             'data': self.data,
             'note': self.notes,
+            'role': self.role,
+            'realtime': self.realtime,
             'is_bumped': self.is_bumped
         }
         return dict

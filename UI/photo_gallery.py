@@ -27,6 +27,7 @@ class PhotoGallery:
                 self.parent.configure(width=self.width)
 
         self.on_click_photo_func = on_click_photo_func
+        self.parent.bindtags(self.parent.bindtags() + ("photo_gallery",))
 
         self.is_horizontal = True
         if orient == "horizontal":
@@ -34,44 +35,52 @@ class PhotoGallery:
             sb.pack(side="bottom", fill="x")
             self.canvas = tk.Canvas(self.parent, highlightthickness=0, borderwidth=0, xscrollcommand=sb.set)
             self.canvas.pack(fill="x")
-            sb.config(command=self.canvas.xview)
+            sb.configure(command=self.canvas.xview)
         else:
             sb = tk.Scrollbar(self.parent, orient=orient, highlightthickness=0, borderwidth=0)
             self.canvas = tk.Canvas(self.parent, highlightthickness=0, borderwidth=0, yscrollcommand=sb.set)
             sb.pack(side="right", fill="y")
             self.canvas.pack(fill="y", expand=True)
             self.is_horizontal = False
-            sb.config(command=self.canvas.yview)
+            sb.configure(command=self.canvas.yview)
 
+        self.canvas.bindtags(self.canvas.bindtags() + ("photo_gallery",))
         self.frame = tk.Frame(self.canvas, highlightthickness=0, borderwidth=0)
         self.frame.bind("<Configure>", lambda event: self.on_configure())
-        self.frame.bind('<Enter>', self.bound_to_mousewheel)
-        self.frame.bind('<Leave>', self.unbound_to_mousewheel)
-        self.canvas.create_window((4, 4), window=self.frame, anchor='nw')
-    
-    def bound_to_mousewheel(self, event):
+        self.frame.bindtags(self.frame.bindtags() + ("photo_gallery",))
+
         # for Windows/Mac OS
-        self.canvas.bind_all("<MouseWheel>", self.on_mousewheel)
+        # for vertical scrolling
+        self.canvas.bind_class("photo_gallery", "<MouseWheel>", lambda event: self.on_mousewheel(event))
+        # for horizontal scrolling
+        self.canvas.bind_class("photo_gallery", "<Shift-MouseWheel>", lambda event: self.on_mousewheel(event))
+
         # for Linux
-        self.canvas.bind_all("<Button-4>", self.on_mousewheel)
-        self.canvas.bind_all("<Button-5>", self.on_mousewheel)
-    
-    def unbound_to_mousewheel(self, event):
-        self.canvas.unbind_all("<MouseWheel>")
-        self.canvas.unbind_all("<Button-4>")
-        self.canvas.unbind_all("<Button-5>")
+        # for vertical scrolling
+        self.canvas.bind_class("photo_gallery", "<Button-4>", lambda event: self.on_mousewheel(event))
+        self.canvas.bind_class("photo_gallery", "<Button-5>", lambda event: self.on_mousewheel(event))
+        # for horizontal scrolling
+        self.canvas.bind_class("photo_gallery", "<Shift-Button-4>", lambda event: self.on_mousewheel(event))
+        self.canvas.bind_class("photo_gallery", "<Shift-Button-5>", lambda event: self.on_mousewheel(event))
+        self.canvas.create_window((4, 4), window=self.frame, anchor='nw')
+
     
     def on_mousewheel(self, event):
+        x,y = self.canvas.winfo_pointerxy()
+        widget_path = str(self.canvas.winfo_containing(x,y))
+        if not widget_path.startswith(str(self.canvas)):
+            return
+
         delta = 0
         if sys.platform == 'darwin': # for OS X # also, if platform.system() == 'Darwin':
             delta = event.delta
         else:                            # for Windows, Linux
             delta = event.delta // 120   # event.delta is some multiple of 120
-        if self.is_horizontal:
-            self.canvas.xview_scroll(int(-1*(delta)), "units")
-        else:
+        if not self.is_horizontal:
             self.canvas.yview_scroll(int(-1*(delta)), "units")
-
+        else:
+            self.canvas.xview_scroll(int(-1*(delta)), "units")
+           
     def on_configure(self):
         # update scrollregion after starting 'mainloop'
         # when all widgets are in canvas
@@ -84,13 +93,17 @@ class PhotoGallery:
             photo = ImageTk.PhotoImage(image=photo)
 
             child_frame = tk.Frame(self.frame, highlightthickness=0, borderwidth=0)
+            child_frame.bindtags(child_frame.bindtags() + ("photo_gallery",))
+
             label = tk.Label(child_frame, image=photo, highlightthickness=0, borderwidth=0)
             label.image = photo  # keep a reference
             label.bind("<Button-1>", lambda e, timestamp=timestamp: self.on_click_photo_func(timestamp))
+            label.bindtags(label.bindtags() + ("photo_gallery",))
             label.pack(side="top", padx=10)
             # timestamp_label = tk.Label(child_frame, text=timestamp, highlightthickness=0, borderwidth=0)
             timestamp_label = get_label(child_frame, text=timestamp.replace("_", ":"))
             timestamp_label.pack(side="top", anchor=tk.CENTER, padx=10)
+            timestamp_label.bindtags(timestamp_label.bindtags() + ("photo_gallery",))
             if self.orient == "horizontal":
                 child_frame.pack(side="left")
             else:
@@ -110,7 +123,7 @@ def on_click_photo(timestamp):
 if __name__ == "__main__":
     root = tk.Tk()
     pg = PhotoGallery(parent=root, on_click_photo_func=on_click_photo)
-    pg.insert_photo("00:00:05", "./data/p15_2/00_00_05.png")
-    pg.insert_photo("00:00:12", "./data/p15_2/00_00_12.png")
-    pg.insert_photo("00:00:19", "./data/p15_2/00_00_19.png")
+    pg.insert_photo("00:00:05", "./data/p20_10/00_00_15.png")
+    pg.insert_photo("00:00:12", "./data/p20_10/00_00_37.png")
+    pg.insert_photo("00:00:19", "./data/p20_10/00_01_06.png")
     root.mainloop()

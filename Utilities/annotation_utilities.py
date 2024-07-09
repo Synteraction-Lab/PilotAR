@@ -17,6 +17,7 @@ FUNC_LIST = {'screenshot_whole': 'Whole Screenshot',
              'incorrect': 'Incorrect',
              'voice': 'Voice',
              'counter': 'Counter'}
+FUNC_WITH_SCREENSHOT = ['Whole Screenshot', 'Screenshot With ROI', 'Focus', 'Correct', 'Incorrect']
 
 
 def check_saving_file(path):
