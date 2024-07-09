@@ -5,7 +5,7 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
 
 ## Publications
 - [PilotAR: Streamlining Pilot Studies with OHMDs from Concept to Insight](), IMWUT'24
-  - Draft paper [PDF](papers/PilotAR_IMWUT24.pdf)
+  - Draft paper [PDF](paper/PilotAR_IMWUT24.pdf)
 ```
 @article{janaka_pilotar_2024,
 	title = {{PilotAR}: {Streamlining} {Pilot} {Studies} with {OHMDs} from {Concept} to {Insight}},
