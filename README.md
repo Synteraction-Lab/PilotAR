@@ -22,6 +22,9 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
 - [Demonstrating PilotAR: A Tool to Assist Wizard-of-Oz Pilot Studies with OHMD](https://doi.org/10.1145/3675094.3677554), UbiComp/ISWC'24
   - Camera Ready [PDF](paper/UbiComp24_Demonstrating_PilotAR.pdf)
 
+- [![Video](paper/pilotar_teaser.jpg)](https://youtu.be/6Ta_eWziOyo)
+
+
 ## Contact person
 - [Cai Runze](https://synteraction.org/our-team)
 - [Nuwan Janaka](https://synteraction.org/our-team) ([In](https://www.linkedin.com/in/nuwan-janaka/))
