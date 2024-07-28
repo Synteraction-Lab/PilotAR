@@ -23,9 +23,9 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
   - Camera Ready [PDF](paper/UbiComp24_Demonstrating_PilotAR.pdf)
 
 ## Contact person
-- [Cai Runze](https://www.nus-hci.org/our-team/)
-- [Nuwan Janaka](https://www.nus-hci.org/our-team/) ([In](https://www.linkedin.com/in/nuwan-janaka/))
-- [Kai Qi](https://www.nus-hci.org/our-team/)
+- [Cai Runze](https://synteraction.org/our-team)
+- [Nuwan Janaka](https://synteraction.org/our-team) ([In](https://www.linkedin.com/in/nuwan-janaka/))
+- [Kai Qi](https://synteraction.org/our-team)
 
 
 ## Project links
