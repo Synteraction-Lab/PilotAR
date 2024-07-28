@@ -4,12 +4,14 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
 - If you find any issues, please create GitHub [issues](https://github.com/Synteraction-Lab/PilotAR/issues) 
 
 ## Publications
-- [PilotAR: Streamlining Pilot Studies with OHMDs from Concept to Insight](), IMWUT'24
-  - Draft paper [PDF](paper/PilotAR_IMWUT24.pdf)
+- [PilotAR: Streamlining Pilot Studies with OHMDs from Concept to Insight](https://doi.org/10.1145/3678576), IMWUT'24
+  - Camera Ready [PDF](paper/IMWUT24_PilotAR.pdf)
 ```
 @article{janaka_pilotar_2024,
 	title = {{PilotAR}: {Streamlining} {Pilot} {Studies} with {OHMDs} from {Concept} to {Insight}},
 	shorttitle = {{PilotAR}},
+	url = {https://doi.org/10.1145/3678576},
+	doi = {10.1145/3678576},
 	language = {en},
 	journal = {Proceedings of the ACM on Interactive, Mobile, Wearable and Ubiquitous Technologies},
 	author = {Janaka, Nuwan and Cai, Runze and Ram, Ashwin and Zhu, Lin and Zhao, Shengdong and Kai Qi, Yong},
@@ -17,7 +19,8 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
 	year = {2024},
 }
 ```
-- [Demonstrating PilotAR: A Tool to Assist Wizard-of-Oz Pilot Studies with OHMD](), UbiComp/ISWC'24
+- [Demonstrating PilotAR: A Tool to Assist Wizard-of-Oz Pilot Studies with OHMD](https://doi.org/10.1145/3675094.3677554), UbiComp/ISWC'24
+  - Camera Ready [PDF](paper/UbiComp24_Demonstrating_PilotAR.pdf)
 
 ## Contact person
 - [Cai Runze](https://www.nus-hci.org/our-team/)
