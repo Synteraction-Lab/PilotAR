@@ -517,7 +517,7 @@ class Analyser:
         for t in selected_tasks:
             styleNormal.textColor = 'black'
             c1 = Paragraph(t.get_timestamp(), styleNormal)
-            c3 = Paragraph(t.get_notes(), styleNormal)
+            c3 = Paragraph(str(t.get_notes().replace("\n", "<br />\n")), styleNormal)
 
             styleNotes = set_normal_style()
             c4 = Paragraph("", styleNotes)
