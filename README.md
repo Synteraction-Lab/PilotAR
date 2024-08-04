@@ -3,6 +3,7 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
 
 - If you find any issues, please create GitHub [issues](https://github.com/Synteraction-Lab/PilotAR/issues) 
 
+
 ## Publications
 - [PilotAR: Streamlining Pilot Studies with OHMDs from Concept to Insight](https://doi.org/10.1145/3678576), IMWUT'24
   - Camera Ready [PDF](paper/IMWUT24_PilotAR.pdf)
@@ -22,13 +23,16 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
 - [Demonstrating PilotAR: A Tool to Assist Wizard-of-Oz Pilot Studies with OHMD](https://doi.org/10.1145/3675094.3677554), UbiComp/ISWC'24
   - Camera Ready [PDF](paper/UbiComp24_Demonstrating_PilotAR.pdf)
 
-- [![Video](paper/pilotar_teaser.jpg)](https://youtu.be/6Ta_eWziOyo)
+- Video: [![Video](paper/pilotar_teaser.jpg)](https://youtu.be/6Ta_eWziOyo)
 
 
 ## Contact person
-- [Cai Runze](https://synteraction.org/our-team)
 - [Nuwan Janaka](https://synteraction.org/our-team) ([In](https://www.linkedin.com/in/nuwan-janaka/))
-- [Kai Qi](https://synteraction.org/our-team)
+- [Cai Runze](https://synteraction.org/our-team)
+
+
+## Contributors
+- Initial contributors: [@RenzoTsai](https://www.github.com/RenzoTsai), [@flairekq](https://www.github.com/SherisseTJW), [@tsy24](https://www.github.com/tsy24), [@janakanuwan](https://www.github.com/janakanuwan), [@wowsiddanth](https://www.github.com/wowsiddanth)
 
 
 ## Project links
@@ -78,12 +82,14 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
    4. Once you finish one session, you can click ``Stop``.
    5. You can modify the ``Participant & Session ID`` and click ``Start`` again to start new session.
 4. You can then analyze the recordings after pilot. The program will automatically pop up the analyzer. 
-You can also click the `Analyzer` in the top panel to open the analyzer's window.
+   - You can also click the `Analyzer` in the top panel to open the analyzer's window.
+5. To run PilotAR as an (independent) video analyzer/annotator, open the `Analyzer`, and then select the ``Create new`` option in the dropdown menu for ``Participant & Session ID``.
 
 ### On Your HoloLens
 1. Open the browser and join a Google Meet (we suggest you save this link to the bookmarks).
 2. Turn on the Speaker and turn off the camera in the Google Meet.
 3. Change the Google Meet layout to enable your PC's shared screen can be full-sized display on the HoloLens.
+
 
 ## Known Issues & Solutions
 - ``AttributeError: CFMachPortCreateRunLoopSource``
@@ -100,8 +106,12 @@ You can also click the `Analyzer` in the top panel to open the analyzer's window
 - Issue with video playing in the Analyzer UI on `Mac M1 chip`
   - Need to install VLC player's Intel version (Enable Rosetta for your terminal).
 
+- Others, [WOzTool-feedback](https://docs.google.com/presentation/d/1J9Xq1sZK7AQYHe1W2tchvYK8YFfUsGZwJCpRXpqzyaU/view)
+
+
 ## Tests
 To run unit test cases, run `python -m unittest` on the terminal
+
 
 ## References
 - Credits to @jianfch for Utilities/stable_whisper.py (code from https://github.com/jianfch/stable-ts)
