@@ -69,8 +69,8 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
 1. Run `main.py` (e.g., `python main.py` via terminal)
 2. You can set up the configurations by clicking `Setup`.
    1. The device configuration, including FPV, TPV, Woz Interface address, and recording sources, can be modified in `Devices`.
-      1. Enter your HoloLens' IP, Username, Password to the FPV's enter box.
-      2. For the TPV, you can create a Google meet and paste the link to the enter box of TPV.
+      1. Enter your HoloLens' IP, Username, Password to the FPV's enter box. Then click `FPV` (blue button) to connect.
+      2. For the TPV, you can create a Google meet and paste the link to the enter box of TPV. Then click `TPV` (blue button) to open the link in browser.
       3. Use your phone to join the Google Meet to provide a TPV.
       4. For the Woz interface, you can share this interface's window in Google Meet.
    2. You can also set up the checklist by clicking `Checklist`.
