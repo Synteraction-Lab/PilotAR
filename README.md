@@ -7,6 +7,7 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
 ## Publications
 - [PilotAR: Streamlining Pilot Studies with OHMDs from Concept to Insight](https://doi.org/10.1145/3678576), IMWUT'24
   - Camera Ready [PDF](paper/IMWUT24_PilotAR.pdf)
+  - [POSTER](paper/PilotAR_poster.pdf)
 ```
 @article{janaka_pilotar_2024,
 	title = {{PilotAR}: {Streamlining} {Pilot} {Studies} with {OHMDs} from {Concept} to {Insight}},
@@ -37,6 +38,7 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
 
 ## Project links
 - Documentation: [here](https://docs.google.com/presentation/d/18W6QEvvQTLHl7Hf6uT8z5MNWrjOWcaP5SRqOvsnnRr4/view?usp=sharing)
+  - See `Sample Setup` in the documentation for the setup of the tool.
 - Tool usage: [offline video](docs/WOzTool_user_guide.mp4)
 - Project folder (private access): [here](https://drive.google.com/drive/folders/1vBHP0YW2hwhJSStCFvWi4LTjTzqru6VU?usp=sharing)
 - [Version info](VERSION.md)
@@ -53,7 +55,7 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
 
 
 ## Installation & Preparation
-1. Install `conda`, if you haven't done it (e.g., [Anaconda](https://docs.anaconda.com/anaconda/install/)/[Miniconda](https://docs.conda.io/en/latest/miniconda.html)).
+1. Install `conda`, if you haven't done it (e.g., [Miniconda](https://docs.conda.io/en/latest/miniconda.html)).
 2. Create conda environment `woz` via `conda env create -f environment.yml`.
 3. Activate `woz` environment via `conda activate woz`
 4. Install [VLC Player](https://www.videolan.org/vlc/)
@@ -63,11 +65,11 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
 
 
 ## Execution (Running the WOzTool)
-- See WOzTool usage: [offline video](docs/WOzTool_user_guide.mp4) or [online video](https://drive.google.com/file/d/1xDKq9QWO3E_08jmHDij__AfRCtFm4jrl/view?usp=sharing)
+- See WOzTool usage: [offline video](docs/WOzTool_user_guide.mp4)
 
-### On Your PC/Mac
+### On Your Computer (PC/Mac)
 1. Run `main.py` (e.g., `python main.py` via terminal)
-2. You can set up the configurations by clicking `Setup`.
+2. You can set up the configurations by clicking `Setup` (e.g., [sample setup](https://docs.google.com/presentation/d/18W6QEvvQTLHl7Hf6uT8z5MNWrjOWcaP5SRqOvsnnRr4/view#slide=id.g217a74f75d0_1_9)).
    1. The device configuration, including FPV, TPV, Woz Interface address, and recording sources, can be modified in `Devices`.
       1. Enter your HoloLens' IP, Username, Password to the FPV's enter box. Then click `FPV` (blue button) to connect.
       2. For the TPV, you can create a Google meet and paste the link to the enter box of TPV. Then click `TPV` (blue button) to open the link in browser.
@@ -85,10 +87,14 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
    - You can also click the `Analyzer` in the top panel to open the analyzer's window.
 5. To run PilotAR as an (independent) video analyzer/annotator, open the `Analyzer`, and then select the ``Create new`` option in the dropdown menu for ``Participant & Session ID``.
 
-### On Your HoloLens
+### On Your HoloLens (HL2)
 1. Open the browser and join a Google Meet (we suggest you save this link to the bookmarks).
+    - To minimize the typing in HL2, you can open the browser in computer (not HL2) and type IP address of HL2 to enter [Windows Device Portal](https://learn.microsoft.com/en-us/windows/uwp/debug-test-perf/device-portal)
+    - Then select `Virtual Input` and copy the Google Meet link on that input and send it to HL2.
 2. Turn on the Speaker and turn off the camera in the Google Meet.
+    -  You DO NOT need to log into Google account to use Google Meet, but then need to type a name to join the meeting.
 3. Change the Google Meet layout to enable your PC's shared screen can be full-sized display on the HoloLens.
+   - Can use `Spotlight` and `Pin` functions on GoogleMeet to keep the required screens (e.g., shared, camera) in the center of the view.
 
 
 ## Known Issues & Solutions
@@ -106,7 +112,7 @@ A toolkit for experimenters to conduct pilot studies more efficiently with AR sm
 - Issue with video playing in the Analyzer UI on `Mac M1 chip`
   - Need to install VLC player's Intel version (Enable Rosetta for your terminal).
 
-- Others, [WOzTool-feedback](https://docs.google.com/presentation/d/1J9Xq1sZK7AQYHe1W2tchvYK8YFfUsGZwJCpRXpqzyaU/view)
+- Others, [WOzTool-feedback](https://docs.google.com/presentation/d/1BCrjZ0aK0cdfRXMJ3AMA2rNpBfOKQKUB4eWOmguZs78/view?usp=drive_link)
 
 
 ## Tests
